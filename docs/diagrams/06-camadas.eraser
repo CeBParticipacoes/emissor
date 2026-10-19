@@ -1,0 +1,36 @@
+// Tipo: cloud-architecture-diagram
+// Camadas da Clean Architecture. Setas = "depende de". Sempre apontam para dentro.
+
+presentation [icon: globe, label: "presentation/ (HTTP)"] {
+  Controllers [icon: server]
+  JwtAuthGuard [icon: lock]
+  DTOs [icon: check-square]
+}
+
+infra [icon: package, label: "infra/ (adaptadores)"] {
+  TypeORM repositórios [icon: postgres]
+  CoraBankGateway [icon: bank]
+  ResendEmailSender [icon: mail]
+  DailyJobs cron [icon: clock]
+  Env config [icon: settings]
+}
+
+application [icon: layers, label: "application/ (casos de uso)"] {
+  Use-cases [icon: play]
+  Portas [icon: plug, label: "Portas (interfaces):\nContractRepository, BankGateway,\nEmailSender, Clock"]
+}
+
+domain [icon: heart, label: "domain/ (regras puras)"] {
+  Entidades [icon: box, label: "Contract, Installment,\nCustomer, User"]
+  Value objects [icon: hash, label: "Money, Document, DueDay"]
+  Calculadora de parcelas [icon: calculator]
+}
+
+Controllers > Use-cases: chama execute()
+DailyJobs cron > Use-cases: chama execute()
+Use-cases > Portas: usa
+Use-cases > Entidades: usa
+TypeORM repositórios > Portas: implementa
+CoraBankGateway > Portas: implementa
+ResendEmailSender > Portas: implementa
+Entidades > Value objects: usa

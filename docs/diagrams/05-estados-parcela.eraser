@@ -1,0 +1,20 @@
+// Tipo: flowchart-diagram
+// Máquina de estados de uma parcela (Installment).
+
+PENDING [shape: oval, color: gray]
+ISSUED [shape: oval, color: blue]
+OVERDUE [shape: oval, color: orange]
+PAID [shape: oval, color: green]
+ISSUE_FAILED [shape: oval, color: red]
+CANCELLED [shape: oval, color: black]
+
+PENDING > ISSUED: boleto emitido no Cora
+PENDING > ISSUE_FAILED: 3 falhas de emissão
+ISSUE_FAILED > PENDING: botão "tentar de novo"
+ISSUED > PAID: webhook + consulta confirma
+ISSUED > OVERDUE: passou do vencimento
+OVERDUE > PAID: pagou atrasado
+PENDING > CANCELLED: contrato cancelado
+ISSUED > CANCELLED: contrato cancelado (cancela no Cora)
+OVERDUE > CANCELLED: contrato cancelado (cancela no Cora)
+ISSUE_FAILED > CANCELLED: contrato cancelado

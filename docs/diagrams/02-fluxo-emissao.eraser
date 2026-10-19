@@ -1,0 +1,30 @@
+// Tipo: flowchart-diagram
+// Rotina diária de emissão (IssueDueInstallmentsUseCase).
+
+Inicio [shape: oval, label: "06:00 cron"]
+Buscar [label: "Buscar parcelas PENDING\ncom vencimento <= hoje + 10 dias"]
+Tem [shape: diamond, label: "Tem parcela?"]
+Fim [shape: oval, label: "Fim"]
+Emitir [label: "POST /v2/invoices no Cora\n(Idempotency-Key da parcela)"]
+Ok [shape: diamond, label: "Deu certo?"]
+Salvar [label: "Guardar id, PDF, linha digitável, Pix\nstatus = ISSUED"]
+Email [label: "E-mail ao cliente\n(Resend)"]
+Falha [label: "issue_attempts + 1\nguardar erro"]
+Tres [shape: diamond, label: "3 tentativas?"]
+Failed [label: "status = ISSUE_FAILED\ne-mail interno ao time"]
+Proxima [label: "Próxima parcela"]
+
+Inicio > Buscar
+Buscar > Tem
+Tem > Fim: não
+Tem > Emitir: sim
+Emitir > Ok
+Ok > Salvar: sim
+Salvar > Email
+Email > Proxima
+Ok > Falha: não
+Falha > Tres
+Tres > Failed: sim
+Tres > Proxima: não
+Failed > Proxima
+Proxima > Tem

@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-cobranca}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cobranca}
+      POSTGRES_DB: ${DB_NAME:-cobranca}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cobranca}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Certificado e chave do Cora ficam fora do repositório. Somente leitura.
+      - ${CORA_CERT_DIR:-./certs}:/certs:ro
+
+volumes:
+  db_data:

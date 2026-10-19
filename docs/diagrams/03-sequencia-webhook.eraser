@@ -1,0 +1,23 @@
+// Tipo: sequence-diagram
+// Pagamento confirmado via webhook (HandleCoraWebhookUseCase).
+
+Cora [icon: bank]
+API [icon: nestjs]
+Banco [icon: postgres]
+Resend [icon: mail]
+Cliente [icon: user]
+
+Cora > API: POST /webhooks/cora\nheaders: webhook-event-type=invoice.paid, webhook-resource-id
+API > Banco: findByCoraInvoiceId(id)
+Banco > API: parcela
+alt [label: parcela já PAID] {
+  API > Cora: 200 OK (nada a fazer)
+}
+else [label: parcela ISSUED ou OVERDUE] {
+  API > Cora: GET /v2/invoices/{id}
+  Cora > API: status = PAID, paid_at
+  API > Banco: parcela.markPaid(paid_at); save
+  API > Resend: e-mail "pagamento confirmado"
+  Resend > Cliente: e-mail
+  API > Cora: 200 OK
+}

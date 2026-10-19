@@ -1,0 +1,30 @@
+// Tipo: cloud-architecture-diagram
+// Visão geral: quem fala com quem.
+
+Time comercial [icon: users]
+
+Navegador [icon: monitor] {
+  Painel React [icon: react]
+}
+
+Docker Compose [icon: docker] {
+  API NestJS [icon: nestjs]
+  Cron diário 06h [icon: clock]
+  PostgreSQL [icon: postgres]
+}
+
+Serviços externos [icon: cloud] {
+  Banco Cora [icon: bank]
+  Resend [icon: mail]
+}
+
+Cliente final [icon: user]
+
+Time comercial > Painel React: usa
+Painel React > API NestJS: HTTP + JWT
+API NestJS > PostgreSQL: TypeORM
+Cron diário 06h > API NestJS: dispara use-cases
+API NestJS > Banco Cora: emite / consulta / cancela boleto (mTLS)
+Banco Cora > API NestJS: webhook invoice.paid
+API NestJS > Resend: envia e-mail
+Resend > Cliente final: boleto, lembrete, atraso, pago

@@ -1,0 +1,67 @@
+// Tipo: entity-relationship-diagram
+// As 5 tabelas. Dinheiro em centavos (int).
+
+users [icon: user] {
+  id uuid pk
+  name string
+  email string unique
+  password_hash string
+  created_at timestamp
+}
+
+customers [icon: briefcase] {
+  id uuid pk
+  name string
+  document string unique
+  document_type enum "CPF | CNPJ"
+  email string
+  created_at timestamp
+}
+
+contracts [icon: file-text] {
+  id uuid pk
+  customer_id uuid fk
+  description string
+  total_amount_cents int
+  installments_count int
+  due_day int
+  first_due_date date
+  fine_percent decimal
+  interest_monthly_percent decimal
+  status enum "ACTIVE | CANCELLED | COMPLETED"
+  created_by uuid fk
+  created_at timestamp
+}
+
+installments [icon: calendar] {
+  id uuid pk
+  contract_id uuid fk
+  number int
+  amount_cents int
+  due_date date
+  status enum "PENDING | ISSUED | OVERDUE | PAID | ISSUE_FAILED | CANCELLED"
+  idempotency_key uuid unique
+  cora_invoice_id string nullable
+  bank_slip_url string nullable
+  digitable_line string nullable
+  pix_emv string nullable
+  issue_attempts int
+  last_issue_error string nullable
+  issued_at timestamp nullable
+  paid_at timestamp nullable
+  cancelled_at timestamp nullable
+}
+
+notifications [icon: mail] {
+  id uuid pk
+  installment_id uuid fk
+  type enum "ISSUED | REMINDER | OVERDUE | PAID"
+  sent_at timestamp
+  error string nullable
+  resend_message_id string nullable
+}
+
+contracts.customer_id > customers.id
+contracts.created_by > users.id
+installments.contract_id > contracts.id
+notifications.installment_id > installments.id
