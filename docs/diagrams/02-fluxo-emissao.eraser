@@ -2,7 +2,7 @@
 // Rotina diária de emissão (IssueDueInstallmentsUseCase).
 
 Inicio [shape: oval, label: "06:00 cron"]
-Buscar [label: "Buscar parcelas PENDING\ncom vencimento <= hoje + 10 dias"]
+Buscar [label: "Buscar parcelas PENDING\nque vencem até hoje + 10 dias"]
 Tem [shape: diamond, label: "Tem parcela?"]
 Fim [shape: oval, label: "Fim"]
 Emitir [label: "POST /v2/invoices no Cora\n(Idempotency-Key da parcela)"]
