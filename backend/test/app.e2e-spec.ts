@@ -4,8 +4,8 @@ import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from './../src/app.module.js';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+describe('Health endpoint (e2e)', () => {
+  let app: INestApplication<App> | undefined;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -16,14 +16,19 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
+  it('/health (GET)', async () => {
+    await request(app!.getHttpServer())
+      .get('/health')
       .expect(200)
-      .expect('Hello World!');
+      .expect((response) => {
+        if (response.body.status !== 'ok') {
+          throw new Error('A resposta de saúde deveria ter status "ok"');
+        }
+      });
   });
 
   afterEach(async () => {
-    await app.close();
+    await app?.close();
+    app = undefined;
   });
 });
