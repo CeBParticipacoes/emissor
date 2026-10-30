@@ -106,7 +106,6 @@ Cada etapa termina com algo rodando e testado. Não pule para a próxima com a a
 1. **Dinheiro em centavos, inteiro.** Nunca `number` com vírgula.
 2. **Domain não importa framework.** Se precisou de `@nestjs/...` dentro de `domain/`, está no lugar errado.
 3. **Use-case fala só com portas.** Se o use-case importou `typeorm` ou `axios`, está errado.
-4. **Teste antes do código** nas regras de negócio. Escreva o teste que falha, depois faça passar.
 5. **Banco só muda por migration.**
 6. **Nomes dizem o que fazem.** `markPaid`, não `update`. `findPendingDueUntil`, não `query2`.
 7. **Um controller chama um use-case.** Sem regra de negócio no controller.
