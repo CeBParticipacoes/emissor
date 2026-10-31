@@ -136,6 +136,8 @@ Cada pasta tem um `README.md` curto explicando o seu papel.
 
 Documentação: https://developers.cora.com.br
 
+
+<!-- TALVEZ NÃO SEJA NECESSÁRIO CORA POR AGR, SE FOR... AVISE-NOS -->
 - **Pré-requisito:** plano Cora Pro e certificado emitido no painel. Stage e produção têm credenciais diferentes.
 - **Login:** `POST {CORA_TOKEN_URL}` com `grant_type=client_credentials&client_id=...`, apresentando o certificado e a chave privada na conexão (mTLS). Devolve `access_token` que dura 24h.
 - **Emitir boleto:** `POST /v2/invoices` com header `Idempotency-Key`. Campos: `code` (nosso id), `customer` (name, email, document{identity, type}), `services[]` (name, description, amount **em centavos**), `payment_terms` (due_date `YYYY-MM-DD`, fine, interest), `payment_forms: ["BANK_SLIP","PIX"]`. Mínimo R$ 5,00. Resposta: `id`, `status`, `payment_options.bank_slip.url` (PDF), `.digitable`, `pix.emv`.
