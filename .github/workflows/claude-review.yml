@@ -19,7 +19,6 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          show_full_output: true # TEMPORÁRIO: diagnóstico, remover depois
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
@@ -61,7 +60,9 @@ jobs:
             - Inclua um link de referência oficial quando existir: docs do NestJS
               (docs.nestjs.com), TypeScript (typescriptlang.org/docs), MDN
               (developer.mozilla.org), Vitest (vitest.dev), TypeORM, class-validator,
-              ou o arquivo em docs/ deste repo.
+              ou o arquivo em docs/ deste repo. Para arquivos do repo use URL
+              absoluta (link relativo não abre em comentário de PR):
+              ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.base_ref }}/docs/ARQUITETURA.md
             - Classifique cada item: [bloqueante] (bug/segurança), [sugestão]
               (melhoria recomendada) ou [nit] (detalhe, opcional).
             - Tom: direto, respeitoso e encorajador. Elogie o que foi bem feito
