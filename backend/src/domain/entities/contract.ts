@@ -1,3 +1,4 @@
+import { DomainError } from '../errors/domain-error.js';
 export type ContractStatus = 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
 
 export class Contract {
@@ -16,6 +17,23 @@ export class Contract {
     readonly createdAt: Date,
   ) {}
 
-  // TODO: cancel(now) — só permitido se ACTIVE.
-  // TODO: markCompleted() — quando todas as parcelas estiverem PAID.
+cancel(_now: Date): void {
+    if (this.status !== 'ACTIVE') {
+      throw new DomainError(
+        `Não é possível cancelar um contrato com status ${this.status}`,
+      );
+    }
+
+    this.status = 'CANCELLED';
+  }
+
+  markCompleted(): void {
+    if (this.status !== 'ACTIVE') {
+      throw new DomainError(
+        `Não é possível concluir um contrato com status ${this.status}`,
+      );
+    }
+
+    this.status = 'COMPLETED';
+  }
 }

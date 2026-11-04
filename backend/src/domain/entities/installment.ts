@@ -36,26 +36,85 @@ export class Installment {
     public cancelledAt: Date | null = null,
   ) {}
 
-  // TODO: implementar as transições abaixo, cada uma validando o status atual
-  // e lançando DomainError se a mudança não for permitida. Um teste por método.
+  markIssued(
+    data: {
+      coraInvoiceId: string;
+      bankSlipUrl: string;
+      digitableLine: string;
+      pixEmv: string | null;
+    },
+    now: Date,
+  ): void {
+    if (this.status !== 'PENDING') {
+      throw new DomainError(
+        `Não é possível emitir uma parcela com status ${this.status}`,
+      );
+    }
 
-  markIssued(_data: { coraInvoiceId: string; bankSlipUrl: string; digitableLine: string; pixEmv: string | null }, _now: Date): void {
-    throw new DomainError('TODO: Installment.markIssued');
+    this.coraInvoiceId = data.coraInvoiceId;
+    this.bankSlipUrl = data.bankSlipUrl;
+    this.digitableLine = data.digitableLine;
+    this.pixEmv = data.pixEmv;
+    this.issuedAt = now;
+    this.status = 'ISSUED';
   }
 
-  markIssueFailed(_error: string, _maxAttempts: number): void {
-    throw new DomainError('TODO: Installment.markIssueFailed');
+ markIssueFailed(error: string, maxAttempts: number): void {
+  if (this.status !== 'PENDING') {
+    throw new DomainError(
+      `Não é possível registrar falha de emissão com status ${this.status}`,
+    );
   }
 
-  markPaid(_paidAt: Date): void {
-    throw new DomainError('TODO: Installment.markPaid');
+  this.issueAttempts += 1;
+  this.lastIssueError = error;
+
+  if (this.issueAttempts >= maxAttempts) {
+    this.status = 'ISSUE_FAILED';
+  }
+}
+
+markPaid(paidAt: Date): void {
+  if (this.status !== 'ISSUED' && this.status !== 'OVERDUE') {
+    throw new DomainError(
+      `Não é possível registrar pagamento de uma parcela com status ${this.status}`,
+    );
   }
 
-  markOverdue(_today: Date): void {
-    throw new DomainError('TODO: Installment.markOverdue');
+  this.paidAt = paidAt;
+  this.status = 'PAID';
+}
+
+markOverdue(today: Date): void {
+  if (this.status !== 'ISSUED') {
+    throw new DomainError(
+      `Não é possível marcar como vencida uma parcela com status ${this.status}`,
+    );
   }
 
-  cancel(_now: Date): void {
-    throw new DomainError('TODO: Installment.cancel');
+  if (today <= this.dueDate) {
+    throw new DomainError(
+      'Não é possível marcar como vencida uma parcela antes do vencimento',
+    );
   }
+
+  this.status = 'OVERDUE';
+}
+
+ cancel(now: Date): void {
+  if (this.status === 'PAID') {
+    throw new DomainError(
+      'Não é possível cancelar uma parcela já paga',
+    );
+  }
+
+  if (this.status === 'CANCELLED') {
+    throw new DomainError(
+      'Esta parcela já está cancelada',
+    );
+  }
+
+  this.cancelledAt = now;
+  this.status = 'CANCELLED';
+}
 }
