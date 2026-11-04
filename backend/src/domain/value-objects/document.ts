@@ -15,10 +15,16 @@ const CNPJ_WEIGHTS = {
   second: [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
 };
 
+const ASCII_ZERO = '0'.charCodeAt(0);
+
+function characterValue(character: string): number {
+  return character.charCodeAt(0) - ASCII_ZERO;
+}
+
 function calculateCheckDigit(characters: string, weights: number[]): number {
   const sum = weights.reduce(
     (total, weight, index) =>
-      total + (characters.charCodeAt(index) - 48) * weight,
+      total + characterValue(characters[index]) * weight,
     0,
   );
 
@@ -37,20 +43,19 @@ function hasValidCheckDigits(
 ): boolean {
   if (hasRepeatedCharacters(characters)) return false;
 
-  const base = weights.first.length;
+  const checkDigitPosition = characters.length - 2;
 
   return (
     calculateCheckDigit(characters, weights.first) ===
-      Number(characters[base]) &&
+      Number(characters[checkDigitPosition]) &&
     calculateCheckDigit(characters, weights.second) ===
-      Number(characters[base + 1])
+      Number(characters[checkDigitPosition + 1])
   );
 }
 
-/** CPF ou CNPJ, guardado sem pontuação. */
 export class Document {
   private constructor(
-    readonly digits: string,
+    readonly value: string,
     readonly type: DocumentType,
   ) {}
 
@@ -71,6 +76,6 @@ export class Document {
       return new Document(normalized, 'CNPJ');
     }
 
-    throw new DomainError(`Documento inválido: ${raw}`);
+    throw new DomainError('Documento inválido');
   }
 }

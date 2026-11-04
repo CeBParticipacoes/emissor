@@ -7,7 +7,7 @@ export interface IssueInvoiceInput {
   customer: {
     name: string;
     email: string;
-    documentDigits: string;
+    documentValue: string;
     documentType: 'CPF' | 'CNPJ';
   };
   description: string;

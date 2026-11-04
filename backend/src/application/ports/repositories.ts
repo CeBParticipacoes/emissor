@@ -15,7 +15,7 @@ export interface UserRepository {
 }
 
 export interface CustomerRepository {
-  findByDocument(documentDigits: string): Promise<Customer | null>;
+  findByDocument(documentValue: string): Promise<Customer | null>;
   save(customer: Customer): Promise<void>;
 }
 
