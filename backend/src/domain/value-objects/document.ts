@@ -2,9 +2,23 @@ import { DomainError } from '../errors/domain-error.js';
 
 export type DocumentType = 'CPF' | 'CNPJ';
 
-function calculateCheckDigit(digits: string, weights: number[]): number {
+const CPF_REGEX = /^\d{11}$/;
+const CNPJ_REGEX = /^[A-Z0-9]{12}\d{2}$/;
+
+const CPF_WEIGHTS = {
+  first: [10, 9, 8, 7, 6, 5, 4, 3, 2],
+  second: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2],
+};
+
+const CNPJ_WEIGHTS = {
+  first: [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+  second: [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+};
+
+function calculateCheckDigit(characters: string, weights: number[]): number {
   const sum = weights.reduce(
-    (total, weight, index) => total + Number(digits[index]) * weight,
+    (total, weight, index) =>
+      total + (characters.charCodeAt(index) - 48) * weight,
     0,
   );
 
@@ -13,45 +27,27 @@ function calculateCheckDigit(digits: string, weights: number[]): number {
   return remainder < 2 ? 0 : 11 - remainder;
 }
 
-function isValidCPF(digits: string): boolean {
-  if (/^(\d)\1+$/.test(digits)) return false;
+function hasRepeatedCharacters(characters: string): boolean {
+  return /^(.)(\1)+$/.test(characters);
+}
 
-  const firstDigit = calculateCheckDigit(
-    digits.slice(0, 9),
-    [10, 9, 8, 7, 6, 5, 4, 3, 2],
-  );
+function hasValidCheckDigits(
+  characters: string,
+  weights: { first: number[]; second: number[] },
+): boolean {
+  if (hasRepeatedCharacters(characters)) return false;
 
-  const secondDigit = calculateCheckDigit(
-    digits.slice(0, 10),
-    [11, 10, 9, 8, 7, 6, 5, 4, 3, 2],
-  );
+  const base = weights.first.length;
 
   return (
-    firstDigit === Number(digits[9]) &&
-    secondDigit === Number(digits[10])
+    calculateCheckDigit(characters, weights.first) ===
+      Number(characters[base]) &&
+    calculateCheckDigit(characters, weights.second) ===
+      Number(characters[base + 1])
   );
 }
 
-function isValidCNPJ(digits: string): boolean {
-  if (/^(\d)\1+$/.test(digits)) return false;
-
-  const firstDigit = calculateCheckDigit(
-    digits.slice(0, 12),
-    [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
-  );
-
-  const secondDigit = calculateCheckDigit(
-    digits.slice(0, 13),
-    [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
-  );
-
-  return (
-    firstDigit === Number(digits[12]) &&
-    secondDigit === Number(digits[13])
-  );
-}
-
-/** CPF ou CNPJ, guardado só com dígitos. */
+/** CPF ou CNPJ, guardado sem pontuação. */
 export class Document {
   private constructor(
     readonly digits: string,
@@ -59,14 +55,20 @@ export class Document {
   ) {}
 
   static parse(raw: string): Document {
-    const digits = raw.replace(/\D/g, '');
+    const normalized = raw.replace(/[^A-Z0-9]/gi, '').toUpperCase();
 
-    if (digits.length === 11 && isValidCPF(digits)) {
-      return new Document(digits, 'CPF');
+    if (
+      CPF_REGEX.test(normalized) &&
+      hasValidCheckDigits(normalized, CPF_WEIGHTS)
+    ) {
+      return new Document(normalized, 'CPF');
     }
 
-    if (digits.length === 14 && isValidCNPJ(digits)) {
-      return new Document(digits, 'CNPJ');
+    if (
+      CNPJ_REGEX.test(normalized) &&
+      hasValidCheckDigits(normalized, CNPJ_WEIGHTS)
+    ) {
+      return new Document(normalized, 'CNPJ');
     }
 
     throw new DomainError(`Documento inválido: ${raw}`);

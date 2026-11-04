@@ -23,7 +23,10 @@ export interface ContractRepository {
   findById(id: string): Promise<Contract | null>;
   list(): Promise<Contract[]>;
   /** Salva o contrato E suas parcelas na mesma transação. */
-  saveWithInstallments(contract: Contract, installments: Installment[]): Promise<void>;
+  saveWithInstallments(
+    contract: Contract,
+    installments: Installment[],
+  ): Promise<void>;
   save(contract: Contract): Promise<void>;
 }
 

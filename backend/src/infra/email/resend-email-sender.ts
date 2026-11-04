@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { EmailMessage, EmailSender } from '../../application/ports/email-sender.js';
+import type {
+  EmailMessage,
+  EmailSender,
+} from '../../application/ports/email-sender.js';
 import { ENV, type Env } from '../config/env.js';
 
 /** Implementa EmailSender com o Resend (https://resend.com/docs). */

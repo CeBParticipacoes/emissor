@@ -15,6 +15,20 @@ describe('Document', () => {
     expect(document.type).toBe('CNPJ');
   });
 
+  it('aceita um CNPJ alfanumérico válido', () => {
+    const document = Document.parse('12.ABC.345/01DE-35');
+
+    expect(document.digits).toBe('12ABC34501DE35');
+    expect(document.type).toBe('CNPJ');
+  });
+
+  it('normaliza letras minúsculas no CNPJ alfanumérico', () => {
+    const document = Document.parse('12.abc.345/01de-35');
+
+    expect(document.digits).toBe('12ABC34501DE35');
+    expect(document.type).toBe('CNPJ');
+  });
+
   it('rejeita um CPF com dígitos verificadores inválidos', () => {
     expect(() => Document.parse('529.982.247-24')).toThrow(
       'Documento inválido',
@@ -23,6 +37,12 @@ describe('Document', () => {
 
   it('rejeita um CNPJ com dígitos verificadores inválidos', () => {
     expect(() => Document.parse('11.222.333/0001-80')).toThrow(
+      'Documento inválido',
+    );
+  });
+
+  it('rejeita um CNPJ alfanumérico com dígitos verificadores inválidos', () => {
+    expect(() => Document.parse('12.ABC.345/01DE-36')).toThrow(
       'Documento inválido',
     );
   });
@@ -40,7 +60,11 @@ describe('Document', () => {
   });
 
   it('rejeita documentos com quantidade incorreta de dígitos', () => {
-    expect(() => Document.parse('123456789')).toThrow(
+    expect(() => Document.parse('123456789')).toThrow('Documento inválido');
+  });
+
+  it('rejeita letras nas posições dos dígitos verificadores do CNPJ', () => {
+    expect(() => Document.parse('12.ABC.345/01DE-XY')).toThrow(
       'Documento inválido',
     );
   });

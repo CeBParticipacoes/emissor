@@ -2,7 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { BANK_GATEWAY, type BankGateway } from '../ports/bank-gateway.js';
 import { EMAIL_SENDER, type EmailSender } from '../ports/email-sender.js';
 import { CLOCK, type Clock } from '../ports/clock.js';
-import { INSTALLMENT_REPOSITORY, type InstallmentRepository } from '../ports/repositories.js';
+import {
+  INSTALLMENT_REPOSITORY,
+  type InstallmentRepository,
+} from '../ports/repositories.js';
 
 /**
  * Roda todo dia (infra/scheduling). Emite no Cora as parcelas que vencem
@@ -11,7 +14,8 @@ import { INSTALLMENT_REPOSITORY, type InstallmentRepository } from '../ports/rep
 @Injectable()
 export class IssueDueInstallmentsUseCase {
   constructor(
-    @Inject(INSTALLMENT_REPOSITORY) private readonly installments: InstallmentRepository,
+    @Inject(INSTALLMENT_REPOSITORY)
+    private readonly installments: InstallmentRepository,
     @Inject(BANK_GATEWAY) private readonly bank: BankGateway,
     @Inject(EMAIL_SENDER) private readonly email: EmailSender,
     @Inject(CLOCK) private readonly clock: Clock,

@@ -1,13 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BANK_GATEWAY, type BankGateway } from '../ports/bank-gateway.js';
 import { CLOCK, type Clock } from '../ports/clock.js';
-import { CONTRACT_REPOSITORY, INSTALLMENT_REPOSITORY, type ContractRepository, type InstallmentRepository } from '../ports/repositories.js';
+import {
+  CONTRACT_REPOSITORY,
+  INSTALLMENT_REPOSITORY,
+  type ContractRepository,
+  type InstallmentRepository,
+} from '../ports/repositories.js';
 
 @Injectable()
 export class CancelContractUseCase {
   constructor(
     @Inject(CONTRACT_REPOSITORY) private readonly contracts: ContractRepository,
-    @Inject(INSTALLMENT_REPOSITORY) private readonly installments: InstallmentRepository,
+    @Inject(INSTALLMENT_REPOSITORY)
+    private readonly installments: InstallmentRepository,
     @Inject(BANK_GATEWAY) private readonly bank: BankGateway,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}

@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { BankGateway, IssueInvoiceInput, IssuedInvoice, InvoiceStatus } from '../../application/ports/bank-gateway.js';
+import type {
+  BankGateway,
+  IssueInvoiceInput,
+  IssuedInvoice,
+  InvoiceStatus,
+} from '../../application/ports/bank-gateway.js';
 import { ENV, type Env } from '../config/env.js';
 
 /**
@@ -24,7 +29,9 @@ export class CoraBankGateway implements BankGateway {
     throw new Error('TODO: CoraBankGateway.issueInvoice');
   }
 
-  async getInvoiceStatus(_coraInvoiceId: string): Promise<{ status: InvoiceStatus; paidAt: Date | null }> {
+  async getInvoiceStatus(
+    _coraInvoiceId: string,
+  ): Promise<{ status: InvoiceStatus; paidAt: Date | null }> {
     // TODO: GET /v2/invoices/{id}. `payments[0].paid_at` quando status PAID (confira o nome do campo na doc).
     throw new Error('TODO: CoraBankGateway.getInvoiceStatus');
   }
