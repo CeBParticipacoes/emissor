@@ -4,7 +4,12 @@ export interface IssueInvoiceInput {
   /** Nosso id da parcela. O Cora devolve no campo `code`. */
   code: string;
   idempotencyKey: string;
-  customer: { name: string; email: string; documentDigits: string; documentType: 'CPF' | 'CNPJ' };
+  customer: {
+    name: string;
+    email: string;
+    documentValue: string;
+    documentType: 'CPF' | 'CNPJ';
+  };
   description: string;
   amountCents: number;
   dueDate: Date;
@@ -27,6 +32,8 @@ export type InvoiceStatus = 'OPEN' | 'PAID' | 'LATE' | 'CANCELLED';
  */
 export interface BankGateway {
   issueInvoice(input: IssueInvoiceInput): Promise<IssuedInvoice>;
-  getInvoiceStatus(coraInvoiceId: string): Promise<{ status: InvoiceStatus; paidAt: Date | null }>;
+  getInvoiceStatus(
+    coraInvoiceId: string,
+  ): Promise<{ status: InvoiceStatus; paidAt: Date | null }>;
   cancelInvoice(coraInvoiceId: string): Promise<void>;
 }

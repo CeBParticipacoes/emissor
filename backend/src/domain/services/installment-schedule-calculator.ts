@@ -19,8 +19,12 @@ export interface ScheduledInstallment {
  * Gera a lista de parcelas de um contrato: valores e datas.
  * Regra pura, sem banco. Chamada pelo use-case CreateContract.
  */
-export function calculateInstallmentSchedule(input: ScheduleInput): ScheduledInstallment[] {
-  const amounts = Money.fromCents(input.totalAmountCents).split(input.installmentsCount);
+export function calculateInstallmentSchedule(
+  input: ScheduleInput,
+): ScheduledInstallment[] {
+  const amounts = Money.fromCents(input.totalAmountCents).split(
+    input.installmentsCount,
+  );
   const dueDay = DueDay.of(input.dueDay);
   const startYear = input.firstDueDate.getUTCFullYear();
   const startMonth = input.firstDueDate.getUTCMonth(); // 0..11
@@ -29,6 +33,10 @@ export function calculateInstallmentSchedule(input: ScheduleInput): ScheduledIns
     const monthIndex = startMonth + i;
     const year = startYear + Math.floor(monthIndex / 12);
     const month = (monthIndex % 12) + 1;
-    return { number: i + 1, amountCents: amount.cents, dueDate: dueDay.resolve(year, month) };
+    return {
+      number: i + 1,
+      amountCents: amount.cents,
+      dueDate: dueDay.resolve(year, month),
+    };
   });
 }

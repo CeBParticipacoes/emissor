@@ -17,6 +17,8 @@ export class DueDay {
   /** Data de vencimento para um ano/mês. `month` é 1..12. */
   resolve(year: number, month: number): Date {
     const lastDayOfMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
-    return new Date(Date.UTC(year, month - 1, Math.min(this.day, lastDayOfMonth)));
+    return new Date(
+      Date.UTC(year, month - 1, Math.min(this.day, lastDayOfMonth)),
+    );
   }
 }

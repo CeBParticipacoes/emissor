@@ -22,7 +22,9 @@ export class DailyJobs {
   async run(): Promise<void> {
     this.log.log('Iniciando rotina diária');
     const result = await this.issueDue.execute();
-    this.log.log(`Emissão: ${result.issued} emitidas, ${result.failed} falharam`);
+    this.log.log(
+      `Emissão: ${result.issued} emitidas, ${result.failed} falharam`,
+    );
     await this.sendReminders.execute();
   }
 }

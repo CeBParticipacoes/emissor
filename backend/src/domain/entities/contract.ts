@@ -1,4 +1,5 @@
 import { DomainError } from '../errors/domain-error.js';
+
 export type ContractStatus = 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
 
 export class Contract {
@@ -17,22 +18,22 @@ export class Contract {
     readonly createdAt: Date,
   ) {}
 
-cancel(_now: Date): void {
-    if (this.status !== 'ACTIVE') {
-      throw new DomainError(
-        `Não é possível cancelar um contrato com status ${this.status}`,
-      );
-    }
+  private ensureStatusIn(allowed: ContractStatus[], action: string): void {
+    if (allowed.includes(this.status)) return;
+
+    throw new DomainError(
+      `Não é possível ${action} um contrato com status ${this.status}`,
+    );
+  }
+
+  cancel(_now: Date): void {
+    this.ensureStatusIn(['ACTIVE'], 'cancelar');
 
     this.status = 'CANCELLED';
   }
 
   markCompleted(): void {
-    if (this.status !== 'ACTIVE') {
-      throw new DomainError(
-        `Não é possível concluir um contrato com status ${this.status}`,
-      );
-    }
+    this.ensureStatusIn(['ACTIVE'], 'concluir');
 
     this.status = 'COMPLETED';
   }

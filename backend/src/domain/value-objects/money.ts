@@ -27,6 +27,9 @@ export class Money {
   }
 
   format(): string {
-    return (this.cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return (this.cents / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
   }
 }

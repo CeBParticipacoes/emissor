@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EMAIL_SENDER, type EmailSender } from '../ports/email-sender.js';
 import { CLOCK, type Clock } from '../ports/clock.js';
-import { INSTALLMENT_REPOSITORY, type InstallmentRepository } from '../ports/repositories.js';
+import {
+  INSTALLMENT_REPOSITORY,
+  type InstallmentRepository,
+} from '../ports/repositories.js';
 
 /**
  * Roda todo dia. Lembrete 3 dias antes do vencimento; aviso de atraso 1 dia depois.
@@ -10,7 +13,8 @@ import { INSTALLMENT_REPOSITORY, type InstallmentRepository } from '../ports/rep
 @Injectable()
 export class SendRemindersUseCase {
   constructor(
-    @Inject(INSTALLMENT_REPOSITORY) private readonly installments: InstallmentRepository,
+    @Inject(INSTALLMENT_REPOSITORY)
+    private readonly installments: InstallmentRepository,
     @Inject(EMAIL_SENDER) private readonly email: EmailSender,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}

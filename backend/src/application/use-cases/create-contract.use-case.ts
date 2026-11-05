@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CONTRACT_REPOSITORY, CUSTOMER_REPOSITORY, type ContractRepository, type CustomerRepository } from '../ports/repositories.js';
+import {
+  CONTRACT_REPOSITORY,
+  CUSTOMER_REPOSITORY,
+  type ContractRepository,
+  type CustomerRepository,
+} from '../ports/repositories.js';
 import { CLOCK, type Clock } from '../ports/clock.js';
 
 export interface CreateContractInput {

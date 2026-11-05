@@ -5,7 +5,9 @@ import { z } from 'zod';
  * com mensagem clara. Melhor do que descobrir às 06:00 quando o cron rodar.
  */
 const schema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
   API_PORT: z.coerce.number().default(3000),
   COMPANY_NAME: z.string().default('Minha Empresa'),
 
@@ -15,7 +17,9 @@ const schema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
 
-  JWT_SECRET: z.string().min(16, 'JWT_SECRET precisa ter pelo menos 16 caracteres'),
+  JWT_SECRET: z
+    .string()
+    .min(16, 'JWT_SECRET precisa ter pelo menos 16 caracteres'),
   JWT_EXPIRES_IN: z.string().default('8h'),
 
   CORA_BASE_URL: z.string().url(),
@@ -39,7 +43,9 @@ export type Env = z.infer<typeof schema>;
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const result = schema.safeParse(source);
   if (!result.success) {
-    const problems = result.error.issues.map((i) => `  ${i.path.join('.')}: ${i.message}`).join('\n');
+    const problems = result.error.issues
+      .map((i) => `  ${i.path.join('.')}: ${i.message}`)
+      .join('\n');
     throw new Error(`Variáveis de ambiente inválidas:\n${problems}`);
   }
   return result.data;
