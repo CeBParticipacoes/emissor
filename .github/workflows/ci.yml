@@ -32,6 +32,11 @@ jobs:
       DB_USER: emissor_test
       DB_PASSWORD: emissor_test_password
       DB_NAME: emissor_test
+      JWT_SECRET: ci-only-secret-for-automated-tests-123456789
+      CORA_BASE_URL: https://cora.example.test
+      CORA_TOKEN_URL: https://cora.example.test/oauth/token
+      EMAIL_FROM: ci@example.test
+      INTERNAL_ALERT_EMAIL: alerts@example.test
 
     steps:
       - uses: actions/checkout@v4
