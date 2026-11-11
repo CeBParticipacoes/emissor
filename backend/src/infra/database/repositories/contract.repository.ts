@@ -8,6 +8,7 @@ import type { Installment } from '../../../domain/entities/installment.js';
 
 import { ContractOrmEntity } from '../entities/contract.entity.js';
 import { InstallmentOrmEntity } from '../entities/installment.entity.js';
+import { toInstallmentOrm } from '../mappers/installment.mapper.js';
 import {
   dateFromDatabase,
   dateToDatabase,
@@ -50,7 +51,7 @@ export class TypeOrmContractRepository implements ContractRepository {
       await contractRepository.save(this.toOrm(contract));
 
       await installmentRepository.save(
-        installments.map((installment) => this.toOrmInstallment(installment)),
+        installments.map(toInstallmentOrm),
       );
     });
   }
@@ -86,29 +87,6 @@ export class TypeOrmContractRepository implements ContractRepository {
       status: contract.status,
       createdBy: contract.createdBy,
       createdAt: contract.createdAt,
-    });
-  }
-
-  private toOrmInstallment(
-    installment: Installment,
-  ): InstallmentOrmEntity {
-    return Object.assign(new InstallmentOrmEntity(), {
-      id: installment.id,
-      contractId: installment.contractId,
-      number: installment.number,
-      amountCents: installment.amountCents,
-      dueDate: dateToDatabase(installment.dueDate),
-      status: installment.status,
-      idempotencyKey: installment.idempotencyKey,
-      coraInvoiceId: installment.coraInvoiceId,
-      bankSlipUrl: installment.bankSlipUrl,
-      digitableLine: installment.digitableLine,
-      pixEmv: installment.pixEmv,
-      issueAttempts: installment.issueAttempts,
-      lastIssueError: installment.lastIssueError,
-      issuedAt: installment.issuedAt,
-      paidAt: installment.paidAt,
-      cancelledAt: installment.cancelledAt,
     });
   }
 }

@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Lê e valida o .env UMA vez, no boot. Se faltar algo, o app nem sobe,
- * com mensagem clara. Melhor do que descobrir às 06:00 quando o cron rodar.
- */
 const schema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])

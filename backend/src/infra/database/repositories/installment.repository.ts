@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Installment } from '../../../domain/entities/installment.js';
+import type { InstallmentStatus } from '../../../domain/entities/installment.js';
 import type { InstallmentRepository } from '../../../application/ports/repositories.js';
 import { InstallmentOrmEntity } from '../entities/installment.entity.js';
+import { toInstallmentOrm } from '../mappers/installment.mapper.js';
 import {
   dateFromDatabase,
   dateToDatabase,
@@ -39,7 +41,9 @@ export class TypeOrmInstallmentRepository implements InstallmentRepository {
   async findPendingDueUntil(limit: Date): Promise<Installment[]> {
     const installments = await this.repository
       .createQueryBuilder('installment')
-      .where('installment.status = :status', { status: 'PENDING' })
+      .where('installment.status = :status', {
+        status: 'PENDING' satisfies InstallmentStatus,
+      })
       .andWhere('installment.dueDate <= :limit', {
         limit: dateToDatabase(limit),
       })
@@ -50,7 +54,7 @@ export class TypeOrmInstallmentRepository implements InstallmentRepository {
   }
 
   async save(installment: Installment): Promise<void> {
-    await this.repository.save(this.toOrm(installment));
+    await this.repository.save(toInstallmentOrm(installment));
   }
 
   private toDomain(entity: InstallmentOrmEntity): Installment {
@@ -72,26 +76,5 @@ export class TypeOrmInstallmentRepository implements InstallmentRepository {
       entity.paidAt,
       entity.cancelledAt,
     );
-  }
-
-  private toOrm(installment: Installment): InstallmentOrmEntity {
-    return Object.assign(new InstallmentOrmEntity(), {
-      id: installment.id,
-      contractId: installment.contractId,
-      number: installment.number,
-      amountCents: installment.amountCents,
-      dueDate: dateToDatabase(installment.dueDate),
-      status: installment.status,
-      idempotencyKey: installment.idempotencyKey,
-      coraInvoiceId: installment.coraInvoiceId,
-      bankSlipUrl: installment.bankSlipUrl,
-      digitableLine: installment.digitableLine,
-      pixEmv: installment.pixEmv,
-      issueAttempts: installment.issueAttempts,
-      lastIssueError: installment.lastIssueError,
-      issuedAt: installment.issuedAt,
-      paidAt: installment.paidAt,
-      cancelledAt: installment.cancelledAt,
-    });
   }
 }

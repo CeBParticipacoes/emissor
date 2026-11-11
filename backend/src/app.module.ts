@@ -17,11 +17,7 @@ import {
   NOTIFICATION_REPOSITORY,
 } from './application/ports/repositories.js';
 
-import { UserOrmEntity } from './infra/database/entities/user.entity.js';
-import { CustomerOrmEntity } from './infra/database/entities/customer.entity.js';
-import { ContractOrmEntity } from './infra/database/entities/contract.entity.js';
-import { InstallmentOrmEntity } from './infra/database/entities/installment.entity.js';
-import { NotificationOrmEntity } from './infra/database/entities/notification.entity.js';
+import { ORM_ENTITIES } from './infra/database/entities/orm-entities.js';
 
 import { TypeOrmUserRepository } from './infra/database/repositories/user.repository.js';
 import { TypeOrmCustomerRepository } from './infra/database/repositories/customer.repository.js';
@@ -44,24 +40,12 @@ import { TypeOrmNotificationRepository } from './infra/database/repositories/not
         username: env.DB_USER,
         password: env.DB_PASSWORD,
         database: env.DB_NAME,
-        entities: [
-          UserOrmEntity,
-          CustomerOrmEntity,
-          ContractOrmEntity,
-          InstallmentOrmEntity,
-          NotificationOrmEntity,
-        ],
+        entities: ORM_ENTITIES,
         synchronize: false,
       }),
     }),
 
-    TypeOrmModule.forFeature([
-      UserOrmEntity,
-      CustomerOrmEntity,
-      ContractOrmEntity,
-      InstallmentOrmEntity,
-      NotificationOrmEntity,
-    ]),
+    TypeOrmModule.forFeature(ORM_ENTITIES),
   ],
 
   controllers: [HealthController],

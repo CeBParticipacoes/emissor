@@ -31,17 +31,6 @@ export class TypeOrmNotificationRepository
     await this.repository.save(this.toOrm(notification));
   }
 
-  private toDomain(entity: NotificationOrmEntity): Notification {
-    return new Notification(
-      entity.id,
-      entity.installmentId,
-      entity.type,
-      entity.sentAt,
-      entity.messageId,
-      entity.error,
-    );
-  }
-
   private toOrm(notification: Notification): NotificationOrmEntity {
     return Object.assign(new NotificationOrmEntity(), {
       id: notification.id,
