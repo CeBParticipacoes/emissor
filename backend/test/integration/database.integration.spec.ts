@@ -32,7 +32,7 @@ import { ContractOrmEntity } from '../../src/infra/database/entities/contract.en
 import { InstallmentOrmEntity } from '../../src/infra/database/entities/installment.entity.js';
 
 describe('Database integration', () => {
-  let app: INestApplication;
+  let app: INestApplication | undefined;
   let dataSource: DataSource;
 
   let userRepository: UserRepository;
@@ -45,19 +45,25 @@ describe('Database integration', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    const application = moduleFixture.createNestApplication();
 
-    dataSource = app.get(DataSource);
+    app = application;
 
-    userRepository = app.get(USER_REPOSITORY);
-    customerRepository = app.get(CUSTOMER_REPOSITORY);
-    contractRepository = app.get(CONTRACT_REPOSITORY);
-    installmentRepository = app.get(INSTALLMENT_REPOSITORY);
+    await application.init();
+
+    dataSource = application.get(DataSource);
+
+    userRepository = application.get(USER_REPOSITORY);
+    customerRepository = application.get(CUSTOMER_REPOSITORY);
+    contractRepository = application.get(CONTRACT_REPOSITORY);
+    installmentRepository = application.get(INSTALLMENT_REPOSITORY);
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+      app = undefined;
+    }
   });
 
   it('salva um contrato com suas parcelas e recupera os dados', async () => {
