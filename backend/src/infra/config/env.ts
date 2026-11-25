@@ -18,6 +18,11 @@ const schema = z.object({
     .min(16, 'JWT_SECRET precisa ter pelo menos 16 caracteres'),
   JWT_EXPIRES_IN: z.string().default('8h'),
 
+  ADMIN_EMAIL: z.string().email('ADMIN_EMAIL precisa ser um e-mail válido'),
+  ADMIN_PASSWORD: z
+    .string()
+    .min(12, 'ADMIN_PASSWORD precisa ter pelo menos 12 caracteres'),
+
   CORA_BASE_URL: z.string().url(),
   CORA_TOKEN_URL: z.string().url(),
   CORA_CLIENT_ID: z.string().default(''),

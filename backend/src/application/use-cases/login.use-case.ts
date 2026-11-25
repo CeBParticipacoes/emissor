@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { USER_REPOSITORY, type UserRepository } from '../ports/repositories.js';
 
 @Injectable()
@@ -7,13 +8,25 @@ export class LoginUseCase {
     @Inject(USER_REPOSITORY) private readonly users: UserRepository,
   ) {}
 
-  async execute(_input: {
+  async execute(input: {
     email: string;
     password: string;
   }): Promise<{ userId: string }> {
-    // TODO: users.findByEmail(); bcrypt.compare(password, user.passwordHash).
-    // Se falhar, lance o MESMO erro para "usuário não existe" e "senha errada" (não vaze qual foi).
-    // A geração do JWT fica na presentation/auth, não aqui.
-    throw new Error('TODO: LoginUseCase');
+    const user = await this.users.findByEmail(input.email);
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    const passwordIsValid = await bcrypt.compare(
+      input.password,
+      user.passwordHash,
+    );
+
+    if (!passwordIsValid) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    return { userId: user.id };
   }
 }

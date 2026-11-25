@@ -3,11 +3,17 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { HealthController } from './presentation/health/health.controller.js';
+import { AuthController } from './presentation/auth/auth.controller.js';
+import { AuthModule } from './presentation/auth/auth.module.js';
+
+import { LoginUseCase } from './application/use-cases/login.use-case.js';
 
 import { ENV, type Env } from './infra/config/env.js';
 import { EnvironmentModule } from './infra/config/environment.module.js';
 
 import { CLOCK, SystemClock } from './application/ports/clock.js';
+
+import { ContractsController } from './presentation/contracts/contracts.controller.js';
 
 import {
   USER_REPOSITORY,
@@ -29,6 +35,7 @@ import { TypeOrmNotificationRepository } from './infra/database/repositories/not
   imports: [
     ScheduleModule.forRoot(),
     EnvironmentModule,
+    AuthModule,
 
     TypeOrmModule.forRootAsync({
       imports: [EnvironmentModule],
@@ -48,10 +55,12 @@ import { TypeOrmNotificationRepository } from './infra/database/repositories/not
     TypeOrmModule.forFeature(ORM_ENTITIES),
   ],
 
-  controllers: [HealthController],
+  controllers: [HealthController, AuthController, ContractsController],
 
   providers: [
     { provide: CLOCK, useClass: SystemClock },
+
+    LoginUseCase,
 
     { provide: USER_REPOSITORY, useClass: TypeOrmUserRepository },
     { provide: CUSTOMER_REPOSITORY, useClass: TypeOrmCustomerRepository },
