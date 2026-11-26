@@ -1,34 +1,35 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 
-import {
-  CONTRACT_REPOSITORY,
-  type ContractRepository,
-} from '../../application/ports/repositories.js';
+import type { Contract } from '../../domain/entities/contract.js';
+import { ListContractsUseCase } from '../../application/use-cases/list-contracts.use-case.js';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+
+function toContractResponse(contract: Contract) {
+  return {
+    id: contract.id,
+    customerId: contract.customerId,
+    description: contract.description,
+    totalAmountCents: contract.totalAmountCents,
+    installmentsCount: contract.installmentsCount,
+    dueDay: contract.dueDay,
+    firstDueDate: contract.firstDueDate,
+    status: contract.status,
+    createdAt: contract.createdAt,
+  };
+}
 
 @Controller('contracts')
 @UseGuards(JwtAuthGuard)
 export class ContractsController {
   constructor(
-    @Inject(CONTRACT_REPOSITORY)
-    private readonly contracts: ContractRepository,
+    private readonly listContracts: ListContractsUseCase,
   ) {}
 
   @Get()
   async list() {
-    const contracts = await this.contracts.list();
+    const contracts = await this.listContracts.execute();
 
-    return contracts.map((contract) => ({
-      id: contract.id,
-      customerId: contract.customerId,
-      description: contract.description,
-      totalAmountCents: contract.totalAmountCents,
-      installmentsCount: contract.installmentsCount,
-      dueDay: contract.dueDay,
-      firstDueDate: contract.firstDueDate,
-      status: contract.status,
-      createdAt: contract.createdAt,
-    }));
+    return contracts.map(toContractResponse);
   }
 }

@@ -7,6 +7,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 
+const BEARER_PREFIX = 'Bearer ';
+
 interface AuthenticatedRequest extends Request {
   user: {
     sub: string;
@@ -19,27 +21,36 @@ export class JwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const token = this.extractBearerToken(request);
 
+    request.user = await this.verifyToken(token);
+
+    return true;
+  }
+
+  private extractBearerToken(request: AuthenticatedRequest): string {
     const authorization = request.headers.authorization;
 
-    if (!authorization || !authorization.startsWith('Bearer ')) {
+    if (!authorization || !authorization.startsWith(BEARER_PREFIX)) {
       throw new UnauthorizedException('Token não informado');
     }
 
-    const token = authorization.slice(7);
+    return authorization.slice(BEARER_PREFIX.length);
+  }
+
+  private async verifyToken(token: string): Promise<{ sub: string }> {
+    let payload: { sub: string };
 
     try {
-      const payload = await this.jwtService.verifyAsync<{ sub: string }>(token);
-
-      if (!payload.sub) {
-        throw new UnauthorizedException('Token inválido');
-      }
-
-      request.user = payload;
-
-      return true;
+      payload = await this.jwtService.verifyAsync<{ sub: string }>(token);
     } catch {
       throw new UnauthorizedException('Token inválido ou expirado');
     }
+
+    if (!payload.sub) {
+      throw new UnauthorizedException('Token inválido');
+    }
+
+    return payload;
   }
 }

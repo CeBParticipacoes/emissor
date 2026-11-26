@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { PASSWORD_MIN_LENGTH } from '../../domain/constants/password.constants.js';
+
 const schema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
@@ -21,7 +23,10 @@ const schema = z.object({
   ADMIN_EMAIL: z.string().email('ADMIN_EMAIL precisa ser um e-mail válido'),
   ADMIN_PASSWORD: z
     .string()
-    .min(12, 'ADMIN_PASSWORD precisa ter pelo menos 12 caracteres'),
+    .min(
+      PASSWORD_MIN_LENGTH,
+      `ADMIN_PASSWORD precisa ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres`,
+    ),
 
   CORA_BASE_URL: z.string().url(),
   CORA_TOKEN_URL: z.string().url(),
@@ -43,12 +48,15 @@ export type Env = z.infer<typeof schema>;
 
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const result = schema.safeParse(source);
+
   if (!result.success) {
     const problems = result.error.issues
       .map((i) => `  ${i.path.join('.')}: ${i.message}`)
       .join('\n');
+
     throw new Error(`Variáveis de ambiente inválidas:\n${problems}`);
   }
+
   return result.data;
 }
 

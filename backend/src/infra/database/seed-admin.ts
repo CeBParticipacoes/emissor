@@ -1,9 +1,12 @@
 import { randomUUID } from 'node:crypto';
+import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { AppDataSource } from './data-source.js';
 import { UserOrmEntity } from './entities/user.entity.js';
 import { loadEnv } from '../config/env.js';
+
+const logger = new Logger('SeedAdmin');
 
 async function seedAdmin(): Promise<void> {
   const env = loadEnv();
@@ -18,7 +21,7 @@ async function seedAdmin(): Promise<void> {
     });
 
     if (existingUser) {
-      console.log('Administrador já cadastrado.');
+      logger.log('Administrador já cadastrado.');
       return;
     }
 
@@ -34,13 +37,19 @@ async function seedAdmin(): Promise<void> {
 
     await users.save(admin);
 
-    console.log('Administrador criado com sucesso.');
+    logger.log('Administrador criado com sucesso.');
   } finally {
     await AppDataSource.destroy();
   }
 }
 
-seedAdmin().catch(() => {
-  console.error('Falha ao executar o cadastro do administrador.');
+seedAdmin().catch((error: unknown) => {
+  const errorStack = error instanceof Error ? error.stack : undefined;
+
+  logger.error(
+    'Falha ao executar o cadastro do administrador.',
+    errorStack,
+  );
+
   process.exitCode = 1;
 });
